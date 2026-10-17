@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - PINOK STAKE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f2f5f9; color: #142236; }
+
+        .admin-header { background: #0a1a2e; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .admin-header h1 { font-size: 1.2rem; }
+        .logout-btn { background: #d97706; color: #0a1a2e; border: none; padding: .6rem 1.4rem; border-radius: 4px; font-weight: 600; cursor: pointer; }
+
+        .admin-container { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 64px); }
+        .admin-sidebar { background: #102640; padding: 1.2rem; }
+        .sidebar-link { display: block; padding: .75rem 1rem; margin-bottom: .4rem; color: #e6ecf3; text-decoration: none; border-radius: 4px; }
+        .sidebar-link:hover { background: #1b3a5c; }
+        .sidebar-link.active { background: #f59e0b; color: #0a1a2e; font-weight: 600; }
+
+        .admin-main { padding: 2rem; }
+        .admin-section { display: none; max-width: 900px; }
+        .admin-section.active { display: block; }
+        .section-title { font-family: Georgia, serif; font-size: 1.7rem; color: #102640; margin-bottom: 1.5rem; }
+
+        .panel { background: #fff; border: 1px solid #d6dee9; border-radius: 6px; padding: 1.8rem; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        label { display: block; margin-bottom: .35rem; color: #102640; font-weight: 600; font-size: .92rem; }
+        input, textarea, select { width: 100%; padding: .65rem .8rem; border: 1px solid #b8c4d4; border-radius: 4px; font-size: 1rem; font-family: inherit; background: #fff; color: #142236; }
+        input[type="file"] { padding: .45rem; background: #f8fafc; }
+        textarea { resize: vertical; }
+        .hint { font-size: .82rem; color: #4a5a6e; margin-top: .3rem; }
+
+        .btn { background: #d97706; color: #0a1a2e; border: none; padding: .75rem 1.8rem; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 1rem; }
+        .btn:hover { background: #b45f04; color: #fff; }
+        .btn:disabled { opacity: .6; cursor: wait; }
+        .btn-sm { padding: .45rem 1rem; font-size: .9rem; }
+        .btn-delete { background: #b91c1c; color: #fff; }
+        .btn-delete:hover { background: #991b1b; color: #fff; }
+
+        .card-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #d6dee9; }
+        .card-row:last-child { border-bottom: none; }
+        .muted { color: #4a5a6e; font-size: .9rem; }
+        .message-box { white-space: pre-wrap; margin-top: .5rem; }
+
+        .badge { display: inline-block; font-size: .75rem; font-weight: 700; padding: .15rem .5rem; border-radius: 3px; color: #fff; background: #b45309; margin-right: .4rem; }
+        .badge.urgent { background: #b91c1c; }
+
+        @media (max-width: 768px) {
+            .admin-container { grid-template-columns: 1fr; }
+            .admin-sidebar { display: flex; flex-wrap: wrap; gap: .4rem; }
+            .sidebar-link { margin: 0; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-header">
+    <h1>PINOK STAKE Admin Dashboard</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="admin-container">
+    <aside class="admin-sidebar">
+        <a href="#" class="sidebar-link active" onclick="showSection('dashboard', this); return false;">Dashboard</a>
+        <a href="#" class="sidebar-link" onclick="showSection('announcements', this); return false;">Announcements</a>
+        <a href="#" class="sidebar-link" onclick="showSection('articles', this); return false;">Articles</a>
+        <a href="#" class="sidebar-link" onclick="showSection('brands', this); return false;">Brands</a>
+        <a href="#" class="sidebar-link" onclick="showSection('leaders', this); return false;">Leadership</a>
+        <a href="#" class="sidebar-link" onclick="showSection('vacancies', this); return false;">Vacancies</a>
+        <a href="#" class="sidebar-link" onclick="showSection('applications', this); return false;">Applications</a>
+        <a href="#" class="sidebar-link" onclick="showSection('inquiries', this); return false;">Inquiries</a>
+    </aside>
+
+    <main class="admin-main">
+
+        <!-- DASHBOARD -->
+        <section class="admin-section active" id="dashboard">
+            <h2 class="section-title">Welcome</h2>
+            <div class="panel">
+                <p>Use the menu on the left to manage the website. Changes appear on the public site straight after you save.</p>
+            </div>
+        </section>
+
+        <!-- ANNOUNCEMENTS -->
+        <section class="admin-section" id="announcements">
+            <h2 class="section-title">News Ticker Announcements</h2>
+            <div class="panel">
+                <p class="muted" style="margin-bottom:1rem">Announcements scroll across the top of the homepage. Urgent ones appear first. Set an expiry date and the item will be hidden automatically after that day.</p>
+                <form onsubmit="handleForm(event, '/api/admin/announcements', null, 'Announcement posted!')">
+                    <div class="form-group">
+                        <label>Headline</label>
+                        <input type="text" name="title" required placeholder="e.g. Office closed on Monday">
+                    </div>
+                    <div class="form-group">
+                        <label>Details (optional)</label>
+                        <input type="text" name="content" placeholder="Short extra detail shown after the headline">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select name="announcement_type">
+                                <option value="urgent">Urgent</option>
+                                <option value="update">Update</option>
+                                <option value="notice">Notice</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Hide after (optional)</label>
+                            <input type="date" name="expires_at">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Post Announcement</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h3 style="margin-bottom:.5rem;color:#102640">Current announcements</h3>
+                <div id="announcementsList">Loading...</div>
+            </div>
+        </section>
+
+        <!-- ARTICLES -->
+        <section class="admin-section" id="articles">
+            <h2 class="section-title">Publish an Article</h2>
+            <div class="panel">
+                <form onsubmit="handleForm(event, '/api/admin/articles', 'featured_image', 'Article published!')">
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" name="title" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select name="category" required>
+                                <option>Corporate Announcements</option>
+                                <option>Brand Updates</option>
+                                <option>Company Milestones</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Brand</label>
+                            <select name="brand">
+                                <option value="">None</option>
+                                <option>PINOK247</option>
+                                <option>Aspire Nations</option>
+                                <option>HomeFix</option>
+                                <option>PINOK Marketplace</option>
+                                <option>Future Ventures</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Excerpt (short summary shown on cards)</label>
+                        <textarea name="excerpt" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Article</label>
+                        <textarea name="content" rows="10" required></textarea>
+                        <div class="hint">Leave a blank line between paragraphs.</div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Author</label>
+                            <input type="text" name="author" placeholder="e.g. Corporate Communications">
+                        </div>
+                        <div class="form-group">
+                            <label>Slug (web address, optional)</label>
+                            <input type="text" name="slug" placeholder="Leave blank to create from title">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Featured Image (optional)</label>
+                        <input type="file" name="image_file" accept="image/*">
+                        <div class="hint">JPG, PNG, WEBP or GIF. Maximum 5MB.</div>
+                    </div>
+                    <button type="submit" class="btn">Publish Article</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- BRANDS -->
+        <section class="admin-section" id="brands">
+            <h2 class="section-title">Add a Brand</h2>
+            <div class="panel">
+                <form onsubmit="handleForm(event, '/api/admin/brands', 'logo', 'Brand added!')">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Brand Name</label>
+                            <input type="text" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <input type="text" name="category" placeholder="e.g. Media & News" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Website</label>
+                            <input type="url" name="website" placeholder="https://">
+                        </div>
+                        <div class="form-group">
+                            <label>Slug (optional)</label>
+                            <input type="text" name="slug" placeholder="Leave blank to create from name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Brand Logo</label>
+                        <input type="file" name="image_file" accept="image/*">
+                        <div class="hint">PNG with transparent background works best. Maximum 5MB.</div>
+                    </div>
+                    <button type="submit" class="btn">Add Brand</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- LEADERSHIP -->
+        <section class="admin-section" id="leaders">
+            <h2 class="section-title">Add a Leader</h2>
+            <div class="panel">
+                <form onsubmit="handleForm(event, '/api/admin/leaders', 'photo', 'Leader added!')">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Position</label>
+                            <input type="text" name="position" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email">
+                        </div>
+                        <div class="form-group">
+                            <label>Brand / Department</label>
+                            <input type="text" name="brand">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea name="bio" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Photo</label>
+                        <input type="file" name="image_file" accept="image/*">
+                        <div class="hint">A square photo works best. Maximum 5MB.</div>
+                    </div>
+                    <button type="submit" class="btn">Add Leader</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- VACANCIES -->
+        <section class="admin-section" id="vacancies">
+            <h2 class="section-title">Post a Vacancy</h2>
+            <div class="panel">
+                <form onsubmit="handleForm(event, '/api/admin/vacancies', null, 'Vacancy posted!')">
+                    <div class="form-group">
+                        <label>Job Title</label>
+                        <input type="text" name="title" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" name="location" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Employment Type</label>
+                            <input type="text" name="employment_type" placeholder="Full-time, Contract...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Salary Range (optional)</label>
+                            <input type="text" name="salary_range">
+                        </div>
+                        <div class="form-group">
+                            <label>Slug (optional)</label>
+                            <input type="text" name="slug" placeholder="Leave blank to create from title">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Post Vacancy</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- APPLICATIONS -->
+        <section class="admin-section" id="applications">
+            <h2 class="section-title">CV Applications</h2>
+            <div class="panel" id="applicationsList">Loading...</div>
+        </section>
+
+        <!-- INQUIRIES -->
+        <section class="admin-section" id="inquiries">
+            <h2 class="section-title">Contact Inquiries</h2>
+            <div class="panel" id="inquiriesList">Loading...</div>
+        </section>
+
+    </main>
+</div>
+
+<script>
+const token = localStorage.getItem('token');
+if (!token) window.location.href = '/admin/';
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const slugify = s => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+function logout() {
+    localStorage.removeItem('token');
+    window.location.href = '/admin/';
+}
+
+function showSection(id, link) {
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    if (link) link.classList.add('active');
+
+    if (id === 'announcements') loadAnnouncements();
+    if (id === 'applications') loadApplications();
+    if (id === 'inquiries') loadInquiries();
+}
+
+async function uploadImage(file) {
+    const fd = new FormData();
+    fd.append('image', file);
+    const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Image upload failed');
+    return data.url;
+}
+
+async function handleForm(e, endpoint, imageField, successMsg) {
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector('button[type="submit"]');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    try {
+        const formData = new FormData(form);
+        const file = formData.get('image_file');
+        const payload = Object.fromEntries(formData);
+        delete payload.image_file;
+
+        const base = payload.title || payload.name;
+        if (payload.slug !== undefined && !payload.slug && base) {
+            payload.slug = slugify(base);
+        }
+
+        if (imageField && file && file.size > 0) {
+            payload[imageField] = await uploadImage(file);
+        }
+
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.status === 401) {
+            alert('Your session has expired. Please log in again.');
+            logout();
+            return;
+        }
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Could not save');
+
+        alert(successMsg);
+        form.reset();
+        if (endpoint.includes('announcements')) loadAnnouncements();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
+// ----- ANNOUNCEMENTS -----
+async function loadAnnouncements() {
+    const box = document.getElementById('announcementsList');
+    box.innerHTML = 'Loading...';
+    try {
+        const res = await fetch('/api/admin/announcements', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) throw new Error('Could not load announcements');
+        const items = await res.json();
+
+        if (!items.length) {
+            box.innerHTML = '<p class="muted">No announcements yet.</p>';
+            return;
+        }
+
+        const today = new Date().toISOString().slice(0, 10);
+        box.innerHTML = items.map(a => {
+            const expired = a.expires_at && a.expires_at < today;
+            const label = a.announcement_type === 'urgent' ? 'URGENT' : (a.announcement_type || 'update').toUpperCase();
+            return `
+                <div class="card-row">
+                    <div>
+                        <span class="badge ${a.announcement_type === 'urgent' ? 'urgent' : ''}">${esc(label)}</span>
+                        <strong>${esc(a.title)}</strong>
+                        ${a.content ? `<br><span class="muted">${esc(a.content)}</span>` : ''}
+                        <br><span class="muted">
+                            Posted ${new Date(a.published_at || a.created_at).toLocaleDateString()}
+                            ${a.expires_at ? ' &middot; Hides after ' + esc(a.expires_at) : ''}
+                            ${expired ? ' &middot; <strong>Expired (hidden from site)</strong>' : ''}
+                        </span>
+                    </div>
+                    <button class="btn btn-sm btn-delete" onclick="deleteAnnouncement(${a.id})">Delete</button>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        box.innerHTML = `<p>${esc(err.message)}</p>`;
+    }
+}
+
+async function deleteAnnouncement(id) {
+    if (!confirm('Delete this announcement? It will be removed from the ticker straight away.')) return;
+    try {
+        const res = await fetch(`/api/admin/announcements/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Could not delete');
+        loadAnnouncements();
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+// ----- APPLICATIONS -----
+async function loadApplications() {
+    const box = document.getElementById('applicationsList');
+    box.innerHTML = 'Loading...';
+    try {
+        const res = await fetch('/api/admin/applications', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) throw new Error('Could not load applications');
+        const apps = await res.json();
+
+        if (!apps.length) {
+            box.innerHTML = '<p>No applications yet.</p>';
+            return;
+        }
+
+        box.innerHTML = apps.map(a => `
+            <div class="card-row">
+                <div>
+                    <strong>${esc(a.first_name)} ${esc(a.last_name)}</strong><br>
+                    ${esc(a.email)} &middot; ${esc(a.phone)} &middot; ${esc(a.location)}<br>
+                    <span class="muted">${esc(a.preferred_brand || 'No brand preference')} &middot; Applied ${new Date(a.created_at).toLocaleDateString()}</span>
+                </div>
+                ${a.cv_file
+                    ? `<button class="btn btn-sm" onclick="downloadCV(${a.id})">Download CV</button>`
+                    : '<span class="muted">No CV</span>'}
+            </div>
+        `).join('');
+    } catch (err) {
+        box.innerHTML = `<p>${esc(err.message)}</p>`;
+    }
+}
+
+async function downloadCV(id) {
+    try {
+        const res = await fetch(`/api/admin/applications/${id}/cv`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Could not download CV');
+        }
+
+        const blob = await res.blob();
+        const disposition = res.headers.get('Content-Disposition') || '';
+        const match = disposition.match(/filename="?([^";]+)"?/);
+        const filename = match ? match[1] : 'cv';
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+// ----- INQUIRIES -----
+async function loadInquiries() {
+    const box = document.getElementById('inquiriesList');
+    box.innerHTML = 'Loading...';
+    try {
+        const res = await fetch('/api/admin/inquiries', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) throw new Error('Could not load inquiries');
+        const items = await res.json();
+
+        if (!items.length) {
+            box.innerHTML = '<p>No inquiries yet.</p>';
+            return;
+        }
+
+        box.innerHTML = items.map(i => `
+            <div class="card-row" style="display:block">
+                <strong>${esc(i.subject)}</strong><br>
+                <span class="muted">From ${esc(i.name)} &middot; ${esc(i.email)} &middot; ${esc(i.phone)} &middot; ${esc(i.inquiry_type)} &middot; ${new Date(i.created_at).toLocaleDateString()}</span>
+                <div class="message-box">${esc(i.message)}</div>
+            </div>
+        `).join('');
+    } catch (err) {
+        box.innerHTML = `<p>${esc(err.message)}</p>`;
+    }
+}
+</script>
+
+</body>
+</html>

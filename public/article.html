@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article - PINOK STAKE LIMITED</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <img src="/images/logo.png.jpg" alt="PINOK STAKE" class="logo-img">
+        </div>
+        <ul class="nav-menu">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/about" class="nav-link">About Us</a></li>
+            <li><a href="/brands" class="nav-link">Our Brands</a></li>
+            <li><a href="/leadership" class="nav-link">Leadership</a></li>
+            <li><a href="/newsroom" class="nav-link active">Newsroom</a></li>
+            <li><a href="/opportunities" class="nav-link">Opportunities</a></li>
+            <li><a href="/careers" class="nav-link">Careers</a></li>
+            <li><a href="/contact" class="nav-link">Contact</a></li>
+        </ul>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+    </div>
+</nav>
+
+<main class="article-page" id="articleBody">
+    <p>Loading article...</p>
+</main>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>PINOK STAKE LIMITED</h4>
+            <p>Building Businesses. Creating Opportunities. Expanding Possibilities.</p>
+        </div>
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/brands">Our Brands</a></li>
+                <li><a href="/newsroom">Newsroom</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Contact</h4>
+            <ul>
+                <li><a href="/contact">Send Message</a></li>
+                <li><a href="mailto:pinokstakelimited@wwwpinokglobalservices.com">Email Us</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 PINOK STAKE LIMITED. All rights reserved.</p></div>
+</footer>
+
+<script src="/js/main.js"></script>
+<script>
+(async function () {
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const slug = decodeURIComponent(window.location.pathname.split('/').pop());
+    const box = document.getElementById('articleBody');
+
+    try {
+        const res = await fetch('/api/articles/' + encodeURIComponent(slug));
+        if (!res.ok) throw new Error('Not found');
+        const a = await res.json();
+
+        document.title = a.title + ' - PINOK STAKE LIMITED';
+
+        const paragraphs = String(a.content || '')
+            .split(/\n\s*\n/)
+            .filter(p => p.trim())
+            .map(p => `<p>${esc(p.trim()).replace(/\n/g, '<br>')}</p>`)
+            .join('');
+
+        box.innerHTML = `
+            <a href="/newsroom" class="back-link">&larr; Back to Newsroom</a>
+            <p class="meta" style="margin-top:1.5rem">
+                ${new Date(a.published_at).toLocaleDateString()} &middot; ${esc(a.category || '')}${a.brand ? ' &middot; ' + esc(a.brand) : ''}
+            </p>
+            <h1>${esc(a.title)}</h1>
+            ${a.featured_image ? `<img src="${esc(a.featured_image)}" alt="" class="article-hero-image">` : ''}
+            <div class="article-body">${paragraphs}</div>
+        `;
+    } catch (err) {
+        box.innerHTML = `
+            <h1>Article not found</h1>
+            <p>This article may have been removed.</p>
+            <a href="/newsroom" class="back-link">&larr; Back to Newsroom</a>
+        `;
+    }
+})();
+</script>
+
+</body>
+</html>

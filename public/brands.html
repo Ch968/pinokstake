@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Brands - PINOK STAKE LIMITED</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <img src="/images/logo.png.jpg" alt="PINOK STAKE" class="logo-img">
+        </div>
+        <ul class="nav-menu">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/about" class="nav-link">About Us</a></li>
+            <li><a href="/brands" class="nav-link active">Our Brands</a></li>
+            <li><a href="/leadership" class="nav-link">Leadership</a></li>
+            <li><a href="/newsroom" class="nav-link">Newsroom</a></li>
+            <li><a href="/opportunities" class="nav-link">Opportunities</a></li>
+            <li><a href="/careers" class="nav-link">Careers</a></li>
+            <li><a href="/contact" class="nav-link">Contact</a></li>
+        </ul>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+    </div>
+</nav>
+
+<section class="page-hero">
+    <h1>Our Brands</h1>
+    <p>A portfolio of trusted brands driving transformation across key sectors.</p>
+</section>
+
+<section class="section">
+    <div class="newsroom-filters">
+        <input type="text" id="brandSearch" class="search-box" placeholder="Search brands by name or service...">
+        <select id="brandCategory" class="filter-select">
+            <option value="">All categories</option>
+        </select>
+    </div>
+    <p class="results-count" id="brandCount"></p>
+    <div id="brandResults" class="brands-grid">
+        <p>Loading brands...</p>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>PINOK STAKE LIMITED</h4>
+            <p>Building Businesses. Creating Opportunities. Expanding Possibilities.</p>
+        </div>
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/brands">Our Brands</a></li>
+                <li><a href="/newsroom">Newsroom</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Contact</h4>
+            <ul>
+                <li><a href="/contact">Send Message</a></li>
+                <li><a href="mailto:pinokstakelimited@wwwpinokglobalservices.com">Email Us</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 PINOK STAKE LIMITED. All rights reserved.</p></div>
+</footer>
+
+<script src="/js/main.js"></script>
+<script>
+(function () {
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const $search = document.getElementById('brandSearch');
+    const $category = document.getElementById('brandCategory');
+    const $results = document.getElementById('brandResults');
+    const $count = document.getElementById('brandCount');
+    let brands = [];
+
+    function render() {
+        const q = $search.value.trim().toLowerCase();
+        const cat = $category.value;
+
+        const matches = brands.filter(b => {
+            if (cat && b.category !== cat) return false;
+            if (!q) return true;
+            return [b.name, b.category, b.description]
+                .some(field => String(field || '').toLowerCase().includes(q));
+        });
+
+        $count.textContent = matches.length === 1
+            ? '1 brand found'
+            : `${matches.length} brands found`;
+
+        if (!matches.length) {
+            $results.innerHTML = '<div class="empty-state">No brands match your search. Try a different word or choose "All categories".</div>';
+            return;
+        }
+
+        $results.innerHTML = matches.map(b => `
+            <div class="brand-card">
+                ${b.logo
+                    ? `<img src="${esc(b.logo)}" alt="${esc(b.name)} logo" class="brand-logo">`
+                    : '<div class="brand-icon">🏢</div>'}
+                <h3>${esc(b.name)}</h3>
+                ${b.category ? `<p class="brand-category">${esc(b.category)}</p>` : ''}
+                <p>${esc(b.description || '')}</p>
+                ${b.website ? `<a href="${esc(b.website)}" target="_blank" rel="noopener" class="brand-link">Visit Website &rarr;</a>` : ''}
+            </div>
+        `).join('');
+    }
+
+    async function init() {
+        try {
+            const res = await fetch('/api/brands');
+            brands = res.ok ? await res.json() : [];
+        } catch (err) {
+            brands = [];
+        }
+
+        const categories = [...new Set(brands.map(b => b.category).filter(Boolean))].sort();
+        $category.insertAdjacentHTML('beforeend',
+            categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join(''));
+
+        if (!brands.length) {
+            $results.innerHTML = '<div class="empty-state">No brands available yet.</div>';
+            $count.textContent = '';
+            return;
+        }
+        render();
+    }
+
+    $search.addEventListener('input', render);
+    $category.addEventListener('change', render);
+    init();
+})();
+</script>
+
+</body>
+</html>

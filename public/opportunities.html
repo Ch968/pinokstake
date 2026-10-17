@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunities - PINOK STAKE LIMITED</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo"><img src="images/logo.png.jpg" alt="PINOK STAKE" class="logo-img"></div>
+        <ul class="nav-menu">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/about" class="nav-link">About Us</a></li>
+            <li><a href="/brands" class="nav-link">Our Brands</a></li>
+            <li><a href="/leadership" class="nav-link">Leadership</a></li>
+            <li><a href="/newsroom" class="nav-link">Newsroom</a></li>
+            <li><a href="/opportunities" class="nav-link active">Opportunities</a></li>
+            <li><a href="/careers" class="nav-link">Careers</a></li>
+            <li><a href="/contact" class="nav-link">Contact</a></li>
+        </ul>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+    </div>
+</nav>
+
+<section class="page-hero">
+    <h1>Business Opportunities</h1>
+    <p>Strategic opportunities for partnerships, collaborations, and growth.</p>
+</section>
+
+<section class="section">
+    <div id="opportunitiesList" class="opportunities-grid">
+        <p>Loading opportunities...</p>
+    </div>
+</section>
+
+<section class="section dark cta-section">
+    <h2>Interested in Partnering?</h2>
+    <p>Get in touch with our partnerships team to explore collaboration opportunities.</p>
+    <a href="/contact" class="btn btn-primary">Send Inquiry →</a>
+</section>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section"><h4>PINOK STAKE LIMITED</h4><p>Building Businesses. Creating Opportunities. Expanding Possibilities.</p></div>
+        <div class="footer-section"><h4>Quick Links</h4><ul><li><a href="/about">About Us</a></li><li><a href="/brands">Our Brands</a></li><li><a href="/newsroom">Newsroom</a></li></ul></div>
+        <div class="footer-section"><h4>Contact</h4><ul><li><a href="/contact">Send Message</a></li><li><a href="mailto:pinokstakelimited@wwwpinokglobalservices.com">Email Us</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 PINOK STAKE LIMITED. All rights reserved.</p></div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+fetch('/api/opportunities')
+    .then(r => r.json())
+    .then(opps => {
+        const container = document.getElementById('opportunitiesList');
+        if (opps.length === 0) {
+            container.innerHTML = '<p>No opportunities available at this time.</p>';
+            return;
+        }
+        container.innerHTML = opps.map(o => `
+            <div class="opportunity-card">
+                <h3>${o.title}</h3>
+                <p class="category">${o.category}</p>
+                <p>${o.description}</p>
+                ${o.deadline ? `<p class="deadline">Deadline: ${new Date(o.deadline).toLocaleDateString()}</p>` : ''}
+                <a href="mailto:${o.contact_email}" class="btn btn-secondary btn-sm">Inquire →</a>
+            </div>
+        `).join('');
+    });
+</script>
+
+</body>
+</html>

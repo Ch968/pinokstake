@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - PINOK STAKE LIMITED</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo"><img src="images/logo.png.jpg" alt="PINOK STAKE" class="logo-img"></div>
+        <ul class="nav-menu">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/about" class="nav-link">About Us</a></li>
+            <li><a href="/brands" class="nav-link">Our Brands</a></li>
+            <li><a href="/leadership" class="nav-link">Leadership</a></li>
+            <li><a href="/newsroom" class="nav-link">Newsroom</a></li>
+            <li><a href="/opportunities" class="nav-link">Opportunities</a></li>
+            <li><a href="/careers" class="nav-link">Careers</a></li>
+            <li><a href="/contact" class="nav-link active">Contact</a></li>
+        </ul>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+    </div>
+</nav>
+
+<section class="page-hero">
+    <h1>Contact Us</h1>
+    <p>Get in touch with PINOK STAKE LIMITED. We'd love to hear from you.</p>
+</section>
+
+<section class="section">
+    <div class="contact-layout">
+        <div class="contact-info">
+            <h2>Contact Information</h2>
+            <div class="info-item">
+                <h3>📧 Email</h3>
+                <a href="mailto:pinokstakelimited@wwwpinokglobalservices.com">pinokstakelimited@wwwpinokglobalservices.com</a>
+            </div>
+            <div class="info-item">
+                <h3>🌐 Website</h3>
+                <p><a href="https://pinokstake.com" target="_blank">pinokstake.com</a></p>
+            </div>
+            <div class="info-item">
+                <h3>💼 Business Hours</h3>
+                <p>Monday - Friday: 9:00 AM - 5:00 PM</p>
+            </div>
+        </div>
+        <div class="contact-form">
+            <h2>Send us a Message</h2>
+            <form id="contactForm">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <input type="tel" name="phone" placeholder="Your Phone" required>
+                <select name="inquiry_type" required>
+                    <option value="">Type of Inquiry</option>
+                    <option value="General">General Inquiry</option>
+                    <option value="Partnership">Partnership Opportunity</option>
+                    <option value="Business">Business Proposal</option>
+                    <option value="Media">Media Inquiry</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" name="subject" placeholder="Subject" required>
+                <textarea name="message" placeholder="Your Message" rows="6" required></textarea>
+                <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section"><h4>PINOK STAKE LIMITED</h4><p>Building Businesses. Creating Opportunities. Expanding Possibilities.</p></div>
+        <div class="footer-section"><h4>Quick Links</h4><ul><li><a href="/about">About Us</a></li><li><a href="/brands">Our Brands</a></li><li><a href="/newsroom">Newsroom</a></li></ul></div>
+        <div class="footer-section"><h4>Contact</h4><ul><li><a href="/contact">Send Message</a></li><li><a href="mailto:pinokstakelimited@wwwpinokglobalservices.com">Email Us</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 PINOK STAKE LIMITED. All rights reserved.</p></div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const res = await fetch('/api/inquiries', {
+        method: 'POST',
+        body: JSON.stringify(Object.fromEntries(data)),
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const result = await res.json();
+    if (result.success) {
+        alert('Thank you! We\'ll get back to you soon.');
+        e.target.reset();
+    }
+});
+</script>
+
+</body>
+</html>

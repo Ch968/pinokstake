@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsroom - PINOK STAKE LIMITED</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <img src="/images/logo.png.jpg" alt="PINOK STAKE" class="logo-img">
+        </div>
+        <ul class="nav-menu">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/about" class="nav-link">About Us</a></li>
+            <li><a href="/brands" class="nav-link">Our Brands</a></li>
+            <li><a href="/leadership" class="nav-link">Leadership</a></li>
+            <li><a href="/newsroom" class="nav-link active">Newsroom</a></li>
+            <li><a href="/opportunities" class="nav-link">Opportunities</a></li>
+            <li><a href="/careers" class="nav-link">Careers</a></li>
+            <li><a href="/contact" class="nav-link">Contact</a></li>
+        </ul>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+    </div>
+</nav>
+
+<section class="page-hero">
+    <h1>Newsroom</h1>
+    <p>Official announcements, updates, and stories from PINOK STAKE LIMITED.</p>
+</section>
+
+<section class="section">
+    <div class="newsroom-filters">
+        <input type="text" id="newsSearch" class="search-box" placeholder="Search articles by title, topic or brand...">
+        <select id="newsCategory" class="filter-select">
+            <option value="">All categories</option>
+        </select>
+    </div>
+    <p class="results-count" id="newsCount"></p>
+    <div id="newsResults" class="articles-grid">
+        <p>Loading articles...</p>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>PINOK STAKE LIMITED</h4>
+            <p>Building Businesses. Creating Opportunities. Expanding Possibilities.</p>
+        </div>
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/brands">Our Brands</a></li>
+                <li><a href="/newsroom">Newsroom</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Contact</h4>
+            <ul>
+                <li><a href="/contact">Send Message</a></li>
+                <li><a href="mailto:pinokstakelimited@wwwpinokglobalservices.com">Email Us</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 PINOK STAKE LIMITED. All rights reserved.</p></div>
+</footer>
+
+<script src="/js/main.js"></script>
+<script>
+(function () {
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const $search = document.getElementById('newsSearch');
+    const $category = document.getElementById('newsCategory');
+    const $results = document.getElementById('newsResults');
+    const $count = document.getElementById('newsCount');
+    let articles = [];
+
+    function render() {
+        const q = $search.value.trim().toLowerCase();
+        const cat = $category.value;
+
+        const matches = articles.filter(a => {
+            if (cat && a.category !== cat) return false;
+            if (!q) return true;
+            return [a.title, a.excerpt, a.content, a.brand, a.category]
+                .some(field => String(field || '').toLowerCase().includes(q));
+        });
+
+        $count.textContent = matches.length === 1
+            ? '1 article found'
+            : `${matches.length} articles found`;
+
+        if (!matches.length) {
+            $results.innerHTML = '<div class="empty-state">No articles match your search. Try a different word or choose "All categories".</div>';
+            return;
+        }
+
+        $results.innerHTML = matches.map(a => `
+            <div class="article-card">
+                ${a.featured_image ? `<img src="${esc(a.featured_image)}" alt="" class="article-image">` : ''}
+                <h3>${esc(a.title)}</h3>
+                <p class="meta">${new Date(a.published_at).toLocaleDateString()} &middot; ${esc(a.category || '')}${a.brand ? ' &middot; ' + esc(a.brand) : ''}</p>
+                <p>${esc(a.excerpt || (a.content || '').slice(0, 150))}...</p>
+                <a href="/article/${encodeURIComponent(a.slug)}" class="brand-link">Read More &rarr;</a>
+            </div>
+        `).join('');
+    }
+
+    async function init() {
+        try {
+            const res = await fetch('/api/articles');
+            articles = res.ok ? await res.json() : [];
+        } catch (err) {
+            articles = [];
+        }
+
+        const categories = [...new Set(articles.map(a => a.category).filter(Boolean))].sort();
+        $category.insertAdjacentHTML('beforeend',
+            categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join(''));
+
+        if (!articles.length) {
+            $results.innerHTML = '<div class="empty-state">No articles published yet.</div>';
+            $count.textContent = '';
+            return;
+        }
+        render();
+    }
+
+    $search.addEventListener('input', render);
+    $category.addEventListener('change', render);
+    init();
+})();
+</script>
+
+</body>
+</html>
