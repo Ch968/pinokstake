@@ -1086,3 +1086,51 @@ body {
 .filter-select option {
     color: var(--ink);
 }
+/* ---------- LOGO WITH NAME AND TAGLINE ---------- */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+
+.logo-img {
+    height: 56px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.logo-name {
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.logo-tagline {
+    color: #c3cfdd;
+    font-size: 0.68rem;
+    letter-spacing: 0.3px;
+    margin-top: 0.15rem;
+}
+
+@media (max-width: 768px) {
+    .logo-img {
+        height: 44px;
+    }
+
+    .logo-name {
+        font-size: 0.95rem;
+    }
+
+    .logo-tagline {
+        display: none;
+    }
+}
