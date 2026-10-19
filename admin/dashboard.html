@@ -24,6 +24,7 @@
         .section-title { font-family: Georgia, serif; font-size: 1.7rem; color: #102640; margin-bottom: 1.5rem; }
 
         .panel { background: #fff; border: 1px solid #d6dee9; border-radius: 6px; padding: 1.8rem; margin-bottom: 1.5rem; }
+        .panel-title { font-size: 1.1rem; color: #102640; margin-bottom: .8rem; }
         .form-group { margin-bottom: 1rem; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         label { display: block; margin-bottom: .35rem; color: #102640; font-weight: 600; font-size: .92rem; }
@@ -38,20 +39,27 @@
         .btn-sm { padding: .45rem 1rem; font-size: .9rem; }
         .btn-delete { background: #b91c1c; color: #fff; }
         .btn-delete:hover { background: #991b1b; color: #fff; }
+        .btn-cancel { background: #e2e8f0; color: #102640; margin-left: .6rem; }
+        .btn-cancel:hover { background: #cbd5e1; color: #102640; }
+        .cancel-btn { display: none; }
 
         .card-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #d6dee9; }
         .card-row:last-child { border-bottom: none; }
+        .row-actions { display: flex; gap: .5rem; flex-shrink: 0; }
         .muted { color: #4a5a6e; font-size: .9rem; }
         .message-box { white-space: pre-wrap; margin-top: .5rem; }
 
         .badge { display: inline-block; font-size: .75rem; font-weight: 700; padding: .15rem .5rem; border-radius: 3px; color: #fff; background: #b45309; margin-right: .4rem; }
         .badge.urgent { background: #b91c1c; }
 
+        .editing-note { background: #fff7ed; border: 1px solid #f59e0b; color: #92400e; padding: .6rem 1rem; border-radius: 4px; margin-bottom: 1rem; font-size: .92rem; display: none; }
+
         @media (max-width: 768px) {
             .admin-container { grid-template-columns: 1fr; }
             .admin-sidebar { display: flex; flex-wrap: wrap; gap: .4rem; }
             .sidebar-link { margin: 0; }
             .form-row { grid-template-columns: 1fr; }
+            .card-row { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -117,16 +125,17 @@
             </div>
 
             <div class="panel">
-                <h3 style="margin-bottom:.5rem;color:#102640">Current announcements</h3>
+                <h3 class="panel-title">Current announcements</h3>
                 <div id="announcementsList">Loading...</div>
             </div>
         </section>
 
         <!-- ARTICLES -->
         <section class="admin-section" id="articles">
-            <h2 class="section-title">Publish an Article</h2>
+            <h2 class="section-title">Articles</h2>
+            <div class="editing-note" id="articlesEditNote">You are editing an article. Change what you need, then click Save Changes. Click Cancel edit to stop.</div>
             <div class="panel">
-                <form onsubmit="handleForm(event, '/api/admin/articles', 'featured_image', 'Article published!')">
+                <form id="articleForm" onsubmit="handleForm(event, '/api/admin/articles', 'featured_image', 'Article published!', 'articles')">
                     <div class="form-group">
                         <label>Title</label>
                         <input type="text" name="title" required>
@@ -174,18 +183,25 @@
                     <div class="form-group">
                         <label>Featured Image (optional)</label>
                         <input type="file" name="image_file" accept="image/*">
-                        <div class="hint">JPG, PNG, WEBP or GIF. Maximum 5MB.</div>
+                        <div class="hint">JPG, PNG, WEBP or GIF. Maximum 5MB. When editing, leave empty to keep the current image.</div>
                     </div>
                     <button type="submit" class="btn">Publish Article</button>
+                    <button type="button" class="btn btn-cancel cancel-btn" onclick="cancelEdit('articleForm', 'articles')">Cancel edit</button>
                 </form>
+            </div>
+
+            <div class="panel">
+                <h3 class="panel-title">Existing articles</h3>
+                <div id="articlesManage">Loading...</div>
             </div>
         </section>
 
         <!-- BRANDS -->
         <section class="admin-section" id="brands">
-            <h2 class="section-title">Add a Brand</h2>
+            <h2 class="section-title">Brands</h2>
+            <div class="editing-note" id="brandsEditNote">You are editing a brand. Change what you need, then click Save Changes. Click Cancel edit to stop.</div>
             <div class="panel">
-                <form onsubmit="handleForm(event, '/api/admin/brands', 'logo', 'Brand added!')">
+                <form id="brandForm" onsubmit="handleForm(event, '/api/admin/brands', 'logo', 'Brand added!', 'brands')">
                     <div class="form-row">
                         <div class="form-group">
                             <label>Brand Name</label>
@@ -213,18 +229,25 @@
                     <div class="form-group">
                         <label>Brand Logo</label>
                         <input type="file" name="image_file" accept="image/*">
-                        <div class="hint">PNG with transparent background works best. Maximum 5MB.</div>
+                        <div class="hint">PNG with transparent background works best. Maximum 5MB. When editing, leave empty to keep the current logo.</div>
                     </div>
                     <button type="submit" class="btn">Add Brand</button>
+                    <button type="button" class="btn btn-cancel cancel-btn" onclick="cancelEdit('brandForm', 'brands')">Cancel edit</button>
                 </form>
+            </div>
+
+            <div class="panel">
+                <h3 class="panel-title">Existing brands</h3>
+                <div id="brandsManage">Loading...</div>
             </div>
         </section>
 
         <!-- LEADERSHIP -->
         <section class="admin-section" id="leaders">
-            <h2 class="section-title">Add a Leader</h2>
+            <h2 class="section-title">Leadership</h2>
+            <div class="editing-note" id="leadersEditNote">You are editing a leader. Change what you need, then click Save Changes. Click Cancel edit to stop.</div>
             <div class="panel">
-                <form onsubmit="handleForm(event, '/api/admin/leaders', 'photo', 'Leader added!')">
+                <form id="leaderForm" onsubmit="handleForm(event, '/api/admin/leaders', 'photo', 'Leader added!', 'leaders')">
                     <div class="form-row">
                         <div class="form-group">
                             <label>Full Name</label>
@@ -252,10 +275,16 @@
                     <div class="form-group">
                         <label>Photo</label>
                         <input type="file" name="image_file" accept="image/*">
-                        <div class="hint">A square photo works best. Maximum 5MB.</div>
+                        <div class="hint">A square photo works best. Maximum 5MB. When editing, leave empty to keep the current photo.</div>
                     </div>
                     <button type="submit" class="btn">Add Leader</button>
+                    <button type="button" class="btn btn-cancel cancel-btn" onclick="cancelEdit('leaderForm', 'leaders')">Cancel edit</button>
                 </form>
+            </div>
+
+            <div class="panel">
+                <h3 class="panel-title">Existing leaders</h3>
+                <div id="leadersManage">Loading...</div>
             </div>
         </section>
 
@@ -295,6 +324,10 @@
                     <button type="submit" class="btn">Post Vacancy</button>
                 </form>
             </div>
+            <div class="panel">
+                <h3 class="panel-title">Open vacancies</h3>
+                <div id="vacanciesManage">Loading...</div>
+            </div>
         </section>
 
         <!-- APPLICATIONS -->
@@ -333,6 +366,8 @@ function showSection(id, link) {
     if (id === 'announcements') loadAnnouncements();
     if (id === 'applications') loadApplications();
     if (id === 'inquiries') loadInquiries();
+    if (id === 'articles' || id === 'brands' || id === 'leaders') refreshManager(id);
+    if (id === 'vacancies') refreshManager('vacancies');
 }
 
 async function uploadImage(file) {
@@ -348,13 +383,18 @@ async function uploadImage(file) {
     return data.url;
 }
 
-async function handleForm(e, endpoint, imageField, successMsg) {
+// ============================================
+// SAVE HANDLER (adds new items, or saves edits)
+// ============================================
+async function handleForm(e, endpoint, imageField, successMsg, kind) {
     e.preventDefault();
     const form = e.target;
     const btn = form.querySelector('button[type="submit"]');
-    const originalText = btn.textContent;
+    if (!form.dataset.label) form.dataset.label = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Saving...';
+
+    const editId = form.dataset.editId;
 
     try {
         const formData = new FormData(form);
@@ -371,8 +411,10 @@ async function handleForm(e, endpoint, imageField, successMsg) {
             payload[imageField] = await uploadImage(file);
         }
 
-        const res = await fetch(endpoint, {
-            method: 'POST',
+        // Editing uses PUT on /api/admin/<kind>/<id>, adding uses POST
+        const url = editId ? `${endpoint}/${editId}` : endpoint;
+        const res = await fetch(url, {
+            method: editId ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
             body: JSON.stringify(payload)
         });
@@ -386,18 +428,157 @@ async function handleForm(e, endpoint, imageField, successMsg) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Could not save');
 
-        alert(successMsg);
-        form.reset();
+        alert(editId ? 'Changes saved!' : successMsg);
+
+        if (editId) {
+            cancelEdit(form.id, kind);
+        } else {
+            form.reset();
+        }
+
         if (endpoint.includes('announcements')) loadAnnouncements();
+        if (kind) refreshManager(kind);
     } catch (err) {
         alert('Error: ' + err.message);
     } finally {
         btn.disabled = false;
-        btn.textContent = originalText;
+        btn.textContent = form.dataset.editId ? 'Save Changes' : form.dataset.label;
     }
 }
 
-// ----- ANNOUNCEMENTS -----
+// ============================================
+// MANAGE LISTS (Edit and Delete)
+// ============================================
+const managed = {
+    articles: {
+        listUrl: '/api/articles',
+        endpoint: '/api/admin/articles',
+        formId: 'articleForm',
+        label: a => a.title,
+        sub: a => [a.category, a.brand].filter(Boolean).join(' · ')
+    },
+    brands: {
+        listUrl: '/api/brands',
+        endpoint: '/api/admin/brands',
+        formId: 'brandForm',
+        label: b => b.name,
+        sub: b => b.category || ''
+    },
+    leaders: {
+        listUrl: '/api/leaders',
+        endpoint: '/api/admin/leaders',
+        formId: 'leaderForm',
+        label: l => l.name,
+        sub: l => l.position || ''
+    },
+    vacancies: {
+        listUrl: '/api/vacancies',
+        endpoint: '/api/admin/vacancies',
+        formId: null,
+        label: v => v.title,
+        sub: v => [v.location, v.employment_type].filter(Boolean).join(' · ')
+    }
+};
+
+const records = {};
+
+async function refreshManager(kind) {
+    const cfg = managed[kind];
+    const box = document.getElementById(kind + 'Manage');
+    if (!cfg || !box) return;
+
+    box.innerHTML = 'Loading...';
+    try {
+        const res = await fetch(cfg.listUrl);
+        if (!res.ok) throw new Error('Could not load list');
+        const items = await res.json();
+        records[kind] = items;
+
+        if (!items.length) {
+            box.innerHTML = '<p class="muted">Nothing here yet.</p>';
+            return;
+        }
+
+        box.innerHTML = items.map(item => `
+            <div class="card-row">
+                <div>
+                    <strong>${esc(cfg.label(item))}</strong><br>
+                    <span class="muted">${esc(cfg.sub(item))}</span>
+                </div>
+                <div class="row-actions">
+                    ${cfg.formId ? `<button class="btn btn-sm" onclick="editRecord('${kind}', ${item.id})">Edit</button>` : ''}
+                    <button class="btn btn-sm btn-delete" onclick="deleteRecord('${kind}', ${item.id})">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    } catch (err) {
+        box.innerHTML = `<p>${esc(err.message)}</p>`;
+    }
+}
+
+function editRecord(kind, id) {
+    const cfg = managed[kind];
+    const item = (records[kind] || []).find(r => r.id === id);
+    if (!item) return alert('Could not find that item. Refresh the page and try again.');
+
+    const form = document.getElementById(cfg.formId);
+    const btn = form.querySelector('button[type="submit"]');
+    if (!form.dataset.label) form.dataset.label = btn.textContent;
+
+    form.reset();
+    Object.keys(item).forEach(key => {
+        const el = form.elements[key];
+        if (el && el.type !== 'file') el.value = item[key] ?? '';
+    });
+
+    form.dataset.editId = id;
+    btn.textContent = 'Save Changes';
+    form.querySelector('.cancel-btn').style.display = 'inline-block';
+    document.getElementById(kind + 'EditNote').style.display = 'block';
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelEdit(formId, kind) {
+    const form = document.getElementById(formId);
+    form.reset();
+    delete form.dataset.editId;
+    const btn = form.querySelector('button[type="submit"]');
+    btn.textContent = form.dataset.label || btn.textContent;
+    form.querySelector('.cancel-btn').style.display = 'none';
+    if (kind) document.getElementById(kind + 'EditNote').style.display = 'none';
+}
+
+async function deleteRecord(kind, id) {
+    const cfg = managed[kind];
+    const item = (records[kind] || []).find(r => r.id === id);
+    const name = item ? cfg.label(item) : 'this item';
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+    try {
+        const res = await fetch(`${cfg.endpoint}/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.status === 401) {
+            alert('Your session has expired. Please log in again.');
+            logout();
+            return;
+        }
+        if (!res.ok) throw new Error('Could not delete');
+
+        // If the item being deleted is open in the form, clear the form
+        const form = cfg.formId && document.getElementById(cfg.formId);
+        if (form && form.dataset.editId == id) cancelEdit(cfg.formId, kind);
+
+        refreshManager(kind);
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+// ============================================
+// ANNOUNCEMENTS
+// ============================================
 async function loadAnnouncements() {
     const box = document.getElementById('announcementsList');
     box.innerHTML = 'Loading...';
@@ -450,7 +631,9 @@ async function deleteAnnouncement(id) {
     }
 }
 
-// ----- APPLICATIONS -----
+// ============================================
+// APPLICATIONS
+// ============================================
 async function loadApplications() {
     const box = document.getElementById('applicationsList');
     box.innerHTML = 'Loading...';
@@ -509,7 +692,9 @@ async function downloadCV(id) {
     }
 }
 
-// ----- INQUIRIES -----
+// ============================================
+// INQUIRIES
+// ============================================
 async function loadInquiries() {
     const box = document.getElementById('inquiriesList');
     box.innerHTML = 'Loading...';

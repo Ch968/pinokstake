@@ -428,6 +428,32 @@ app.delete('/api/admin/announcements/:id', verifyToken, (req, res) => {
 });
 
 // ============================================
+// DELETE BRANDS, LEADERS, VACANCIES
+// (articles delete and all edit routes already exist)
+// ============================================
+
+app.delete('/api/admin/brands/:id', verifyToken, (req, res) => {
+    db.run('DELETE FROM brands WHERE id = ?', [req.params.id], err => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
+    });
+});
+
+app.delete('/api/admin/leaders/:id', verifyToken, (req, res) => {
+    db.run('DELETE FROM leaders WHERE id = ?', [req.params.id], err => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
+    });
+});
+
+app.delete('/api/admin/vacancies/:id', verifyToken, (req, res) => {
+    db.run('DELETE FROM vacancies WHERE id = ?', [req.params.id], err => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true });
+    });
+});
+
+// ============================================
 // PAGES
 // ============================================
 
